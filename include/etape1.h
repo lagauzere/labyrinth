@@ -2,6 +2,12 @@
 #define ETAPE1_H
 #include <wchar.h>
 
+
+#define WALL L'█'
+#define PATH L' '
+#define PLAYER L'o'
+#define EXIT L'-'
+
 typedef struct Labyrinthe {
     int rows;
     int columns;
