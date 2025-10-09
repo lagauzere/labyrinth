@@ -8,9 +8,10 @@
 int main() {
     srand(time(NULL));
     setlocale(LC_ALL, "");
-    Labyrinthe labyrinthe = initLabyrinthe(11, 25);
-    createLabyrinthe(&labyrinthe);
-    displayLabyrinthe(&labyrinthe);
-    freeLabyrinthe(&labyrinthe);
+    // Labyrinthe labyrinthe = initLabyrinthe(11, 25);
+    // createLabyrinthe(&labyrinthe);
+    // displayLabyrinthe(&labyrinthe);
+    // freeLabyrinthe(&labyrinthe);
+    openMenu();
     return 0;
 }
