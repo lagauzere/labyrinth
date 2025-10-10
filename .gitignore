@@ -1,3 +1,4 @@
 # Ignorer les dossiers de compilation
 obj/
 bin/
+save.txt
