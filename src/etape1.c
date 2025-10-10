@@ -51,7 +51,7 @@ void buildLabyrinthBasys(Labyrinth* labyrinth){
         }
     }
     // Set entrance and exit
-    labyrinth->map[0][1] = PLAYER; // Entrance
+    labyrinth->map[0][1] = ENTRANCE; // Entrance
     labyrinth->map[labyrinth->rows - 1][labyrinth->columns - 2] = EXIT; // Exit
 }
 

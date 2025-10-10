@@ -6,6 +6,43 @@
 #include <wchar.h>
 
 
+bool isExitReached(Labyrinth* labyrinth){
+    if(labyrinth->map[labyrinth->playerPosition[0]][labyrinth->playerPosition[1]] == EXIT){
+        printf("Félicitations! Vous avez atteint la sortie!\n");
+        return true;
+    }
+    return false;
+}
+
+void handlePlayerMovement(Labyrinth* labyrinth, char direction){
+    int newRow = labyrinth->playerPosition[0];
+    int newCol = labyrinth->playerPosition[1];
+
+    switch(direction){
+        case 'z': // Up
+            newRow--;
+            break;
+        case 's': // Down
+            newRow++;
+            break;
+        case 'q': // Left
+            newCol--;
+            break;
+        case 'd': // Right
+            newCol++;
+            break;
+        default:
+            return; // Invalid input
+    }
+
+    if(newRow >= 0 && newRow < labyrinth->rows && newCol >= 0 && newCol < labyrinth->columns){
+        if(labyrinth->map[newRow][newCol] != WALL){
+            labyrinth->playerPosition[0] = newRow;
+            labyrinth->playerPosition[1] = newCol;
+        }
+    }
+}
+
 // overwrite file if exists, if not create it
 void saveLabyrinthInFile(Labyrinth* labyrinth, const char* filename) {
     FILE* file = fopen(filename, "w");
@@ -64,7 +101,7 @@ void loadLabyrinthFromFile(Labyrinth* labyrinth, const char* filename) {
     fclose(file);
 }
 
-void newLabyrinth(){
+void newLabyrinth(Labyrinth* labyrinth){
     printf("merci de donner les dimensions du labyrinth (largeur hauteur):\n");
     printf("les doivent être impairs et supérieurs à 5\n");
     int width = 0, height = 0;
@@ -76,49 +113,65 @@ void newLabyrinth(){
             printf("dimensions invalides, merci de réessayer:\n");
         }
     }
-    Labyrinth labyrinth = initLabyrinth(height, width);
-    createLabyrinth(&labyrinth);
-    displayLabyrinth(&labyrinth);
-    saveLabyrinthInFile(&labyrinth, "save.txt");
-    freeLabyrinth(&labyrinth);
+    *labyrinth = initLabyrinth(height, width);
+    createLabyrinth(labyrinth);
+    displayLabyrinth(labyrinth);
+    saveLabyrinthInFile(labyrinth, "save.txt");
     printf("labyrinth libéré\n");
 }
 
-void startGame(){
-    // Implementation of startGame function
+
+// need to be fixed so that you dont have to press enter to validate the move
+void startGame(Labyrinth* labyrinth ){
+    char move = ' ';
+    printf("Entrez votre mouvement (z: haut, s: bas, q: gauche, d: droite):\n");
+    displayLabyrinth(labyrinth);
+    while (!isExitReached(labyrinth)) {
+        // need to find a way to handle single key press without enter
+        move = getchar();
+        handlePlayerMovement(labyrinth, move);
+        system("clear"); 
+        displayLabyrinth(labyrinth);
+    }
 }
 
-void loadGame(){
-    Labyrinth labyrinth;
-    loadLabyrinthFromFile(&labyrinth, "save.txt");
-    displayLabyrinth(&labyrinth);
-    freeLabyrinth(&labyrinth);
+void loadGame(Labyrinth* labyrinth){
+    char filename[100] = "save.txt";
+    printf("Entrez le nom du fichier de sauvegarde :\n");
+    scanf("%s", filename);
+
+    loadLabyrinthFromFile(labyrinth, filename);
+    displayLabyrinth(labyrinth);
+    freeLabyrinth(labyrinth);
     // Implementation of loadGame function  
 }
 
-void exitGame(){
-    // Implementation of exitGame function
-}
-
 void openMenu(){
-    printf("Merci de choisir une option:\n");
-    printf("1. Nouveau Labyrinth\n");
-    printf("commencer une partie\n");
-    printf("2. Charger une partie\n");
-    printf("3. Quitter\n");
-    int choice;
-    scanf("%d", &choice);
-    switch(choice){
-        case 1:
-            newLabyrinth();
-            startGame();
+    Labyrinth labyrinth;
+    while (1)
+    {
+        printf("Merci de choisir une option:\n");
+        printf("1. Nouveau Labyrinth\n");
+        printf("2. Commencer une partie\n");
+        printf("3. Charger une partie\n");
+        printf("4. Quitter\n");
+        int choice;
+        scanf("%d", &choice);
+        switch(choice){
+            case 1:
+                newLabyrinth(&labyrinth);
+                break;
+            case 2:
+                startGame(&labyrinth);
+                break;
+            case 3:
+                loadGame(&labyrinth);
+                break;
+            case 4:
+                printf("Au revoir!\n");
+                return;
             break;
-        case 2:
-            loadGame();
-            break;
-        case 3:
-            exitGame();
-            break;
+        }
     }
 }
 

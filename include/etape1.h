@@ -7,6 +7,7 @@
 #define PATH ' '
 #define PLAYER 'o'
 #define EXIT '-'
+#define ENTRANCE '~'
 
 typedef struct Labyrinth {
     int rows;
