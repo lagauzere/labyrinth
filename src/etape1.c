@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "etape1.h"
 #include <stdbool.h>
+#include <locale.h>
 
 Labyrinthe initLabyrinthe(int rows, int columns){
     Labyrinthe labyrinthe;
@@ -23,16 +24,20 @@ void freeLabyrinthe(Labyrinthe* labyrinthe){
     free(labyrinthe->map);
 }
 
+
 void displayLabyrinthe(const Labyrinthe* labyrinthe){
+    printf("test\n");
     for(int i = 0; i < labyrinthe->rows; i++){
         for(int j = 0; j < labyrinthe->columns; j++){
             if (i == labyrinthe->playerPosition[0] && j == labyrinthe->playerPosition[1]) {
-                wprintf(L"%lc", PLAYER); // Display player
-            } else {
-                wprintf(L"%lc", labyrinthe->map[i][j]);
+                printf("%c", PLAYER); 
+            }else if (labyrinthe->map[i][j] == WALL) {
+                printf("%s", UTF8_WALL); 
+            }else {
+                printf("%c", labyrinthe->map[i][j]);
             }
         }
-        wprintf(L"\n");
+        printf("\n");
     }
 }
 

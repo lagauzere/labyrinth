@@ -2,16 +2,16 @@
 #define ETAPE1_H
 #include <wchar.h>
 
-
-#define WALL L'█'
-#define PATH L' '
-#define PLAYER L'o'
-#define EXIT L'-'
+#define UTF8_WALL "█"
+#define WALL '#'
+#define PATH ' '
+#define PLAYER 'o'
+#define EXIT '-'
 
 typedef struct Labyrinthe {
     int rows;
     int columns;
-    wchar_t **map;
+    char **map;
     int playerPosition[2];
 } Labyrinthe;
 

@@ -7,11 +7,15 @@
 
 int main() {
     srand(time(NULL));
-    setlocale(LC_ALL, "");
-    // Labyrinthe labyrinthe = initLabyrinthe(11, 25);
-    // createLabyrinthe(&labyrinthe);
-    // displayLabyrinthe(&labyrinthe);
-    // freeLabyrinthe(&labyrinthe);
+    // test etape 1
+    printf("--- Etape 1 ---\n");
+    Labyrinthe labyrinthe = initLabyrinthe(11, 25);
+    createLabyrinthe(&labyrinthe);
+    displayLabyrinthe(&labyrinthe);
+    freeLabyrinthe(&labyrinthe);
+    
+    // test etape 2
+    printf("\n--- Etape 2 ---\n");
     openMenu();
     return 0;
 }
