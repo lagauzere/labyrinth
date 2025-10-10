@@ -4,61 +4,60 @@
 #include <stdbool.h>
 #include <locale.h>
 
-Labyrinthe initLabyrinthe(int rows, int columns){
-    Labyrinthe labyrinthe;
-    labyrinthe.map = malloc(rows * sizeof(wchar_t*));
+Labyrinth initLabyrinth(int rows, int columns){
+    Labyrinth labyrinth;
+    labyrinth.map = malloc(rows * sizeof(wchar_t*));
     for(int i = 0; i < rows; i++){
-        labyrinthe.map[i] = malloc(columns * sizeof(wchar_t));
+        labyrinth.map[i] = malloc(columns * sizeof(wchar_t));
     }
-    labyrinthe.rows = rows;
-    labyrinthe.columns = columns;
-    labyrinthe.playerPosition[0] = 0;
-    labyrinthe.playerPosition[1] = 1;
-    return labyrinthe;
+    labyrinth.rows = rows;
+    labyrinth.columns = columns;
+    labyrinth.playerPosition[0] = 0;
+    labyrinth.playerPosition[1] = 1;
+    return labyrinth;
 }
 
-void freeLabyrinthe(Labyrinthe* labyrinthe){
-    for(int i = 0; i < labyrinthe->rows; i++){
-        free(labyrinthe->map[i]);
+void freeLabyrinth(Labyrinth* labyrinth){
+    for(int i = 0; i < labyrinth->rows; i++){
+        free(labyrinth->map[i]);
     }
-    free(labyrinthe->map);
+    free(labyrinth->map);
 }
 
 
-void displayLabyrinthe(const Labyrinthe* labyrinthe){
-    printf("test\n");
-    for(int i = 0; i < labyrinthe->rows; i++){
-        for(int j = 0; j < labyrinthe->columns; j++){
-            if (i == labyrinthe->playerPosition[0] && j == labyrinthe->playerPosition[1]) {
+void displayLabyrinth(const Labyrinth* labyrinth){
+    for(int i = 0; i < labyrinth->rows; i++){
+        for(int j = 0; j < labyrinth->columns; j++){
+            if (i == labyrinth->playerPosition[0] && j == labyrinth->playerPosition[1]) {
                 printf("%c", PLAYER); 
-            }else if (labyrinthe->map[i][j] == WALL) {
+            }else if (labyrinth->map[i][j] == WALL) {
                 printf("%s", UTF8_WALL); 
             }else {
-                printf("%c", labyrinthe->map[i][j]);
+                printf("%c", labyrinth->map[i][j]);
             }
         }
         printf("\n");
     }
 }
 
-void buildLabyrinthBasys(Labyrinthe* labyrinthe){
-    for(int i = 0; i < labyrinthe->rows; i++){
-        for(int j = 0; j < labyrinthe->columns; j++){
+void buildLabyrinthBasys(Labyrinth* labyrinth){
+    for(int i = 0; i < labyrinth->rows; i++){
+        for(int j = 0; j < labyrinth->columns; j++){
             if( i % 2 == 1 && j % 2 ==1 ) {
-                labyrinthe->map[i][j] = PATH; // Path
+                labyrinth->map[i][j] = PATH; // Path
             } else {
-                labyrinthe->map[i][j] = WALL; // Wall
+                labyrinth->map[i][j] = WALL; // Wall
             }
         }
     }
     // Set entrance and exit
-    labyrinthe->map[0][1] = PLAYER; // Entrance
-    labyrinthe->map[labyrinthe->rows - 1][labyrinthe->columns - 2] = EXIT; // Exit
+    labyrinth->map[0][1] = PLAYER; // Entrance
+    labyrinth->map[labyrinth->rows - 1][labyrinth->columns - 2] = EXIT; // Exit
 }
 
-void displaymapValues( int **mapvalues, Labyrinthe* labyrinthe){
-    for(int i = 0; i < labyrinthe->rows; i++){
-        for(int j = 0; j < labyrinthe->columns; j++){
+void displaymapValues( int **mapvalues, Labyrinth* labyrinth){
+    for(int i = 0; i < labyrinth->rows; i++){
+        for(int j = 0; j < labyrinth->columns; j++){
             if(mapvalues){
                 printf("%3d ", mapvalues[i][j]);
             }
@@ -70,9 +69,9 @@ void displaymapValues( int **mapvalues, Labyrinthe* labyrinthe){
     }
 }
 
-void replaceAllInMapValues(int oldValue, int newValue, int **mapvalues, Labyrinthe* labyrinthe){
-    for(int i = 0; i < labyrinthe->rows; i++){
-        for(int j = 0; j < labyrinthe->columns; j++){
+void replaceAllInMapValues(int oldValue, int newValue, int **mapvalues, Labyrinth* labyrinth){
+    for(int i = 0; i < labyrinth->rows; i++){
+        for(int j = 0; j < labyrinth->columns; j++){
             if(mapvalues[i][j] == oldValue){
                 mapvalues[i][j] = newValue;
             }
@@ -80,17 +79,17 @@ void replaceAllInMapValues(int oldValue, int newValue, int **mapvalues, Labyrint
     }
 }
 
-void getRandomRoom(int *row, int *col, Labyrinthe* labyrinthe){
+void getRandomRoom(int *row, int *col, Labyrinth* labyrinth){
     do {
-        *row = (rand() % (labyrinthe->rows / 2)) * 2 + 1;
-        *col = (rand() % (labyrinthe->columns / 2)) * 2 + 1;
-    } while(*row <= 0 || *row >= labyrinthe->rows - 1 || *col <= 0 || *col >= labyrinthe->columns - 1);
+        *row = (rand() % (labyrinth->rows / 2)) * 2 + 1;
+        *col = (rand() % (labyrinth->columns / 2)) * 2 + 1;
+    } while(*row <= 0 || *row >= labyrinth->rows - 1 || *col <= 0 || *col >= labyrinth->columns - 1);
 }
 
-bool isLabyrinthComplete(int **mapvalues, Labyrinthe* labyrinthe ){
+bool isLabyrinthComplete(int **mapvalues, Labyrinth* labyrinth ){
     int firstValue = mapvalues[1][1];
-    for(int i = 0; i < labyrinthe->rows; i++){
-        for(int j = 0; j < labyrinthe->columns; j++){
+    for(int i = 0; i < labyrinth->rows; i++){
+        for(int j = 0; j < labyrinth->columns; j++){
             if( i % 2 == 1 && j % 2 ==1 ) {
                 if(mapvalues[i][j] != firstValue){
                     return false;
@@ -101,7 +100,7 @@ bool isLabyrinthComplete(int **mapvalues, Labyrinthe* labyrinthe ){
     return true;
 }
 
-void tryToremoveRandomWallAtRoomCoords(int roomRow, int roomCol, int **mapvalues, Labyrinthe* labyrinthe){
+void tryToremoveRandomWallAtRoomCoords(int roomRow, int roomCol, int **mapvalues, Labyrinth* labyrinth){
     int direction = rand() % 4; 
     int wallRow = roomRow;
     int wallCol = roomCol;
@@ -126,43 +125,43 @@ void tryToremoveRandomWallAtRoomCoords(int roomRow, int roomCol, int **mapvalues
             nextRoomCol += 2;
             break;
     }
-    if(nextRoomRow > 0 && nextRoomRow < labyrinthe->rows-1 && nextRoomCol > 0 && nextRoomCol < labyrinthe->columns-1
+    if(nextRoomRow > 0 && nextRoomRow < labyrinth->rows-1 && nextRoomCol > 0 && nextRoomCol < labyrinth->columns-1
         && mapvalues[roomRow][roomCol] != mapvalues[nextRoomRow][nextRoomCol] ){
         if(mapvalues[roomRow][roomCol] != mapvalues[nextRoomRow][nextRoomCol]){
-            labyrinthe->map[wallRow][wallCol] = PATH; // Remove wall
+            labyrinth->map[wallRow][wallCol] = PATH; // Remove wall
             int oldValue = mapvalues[nextRoomRow][nextRoomCol];
             int newValue = mapvalues[roomRow][roomCol];
             mapvalues[wallRow][wallCol] = newValue; 
-            replaceAllInMapValues(oldValue, newValue, mapvalues, labyrinthe);
+            replaceAllInMapValues(oldValue, newValue, mapvalues, labyrinth);
         }
     }
 
     
 }
 
-void createLabyrinthe(Labyrinthe* labyrinthe){
+void createLabyrinth(Labyrinth* labyrinth){
     int count = 1;
-    int **mapvalues = malloc(labyrinthe->rows * sizeof(int*));
-    for(int i = 0; i < labyrinthe->rows; i++){
-        mapvalues[i] = malloc(labyrinthe->columns * sizeof(int));
+    int **mapvalues = malloc(labyrinth->rows * sizeof(int*));
+    for(int i = 0; i < labyrinth->rows; i++){
+        mapvalues[i] = malloc(labyrinth->columns * sizeof(int));
     }
 
-    for(int i = 0; i < labyrinthe->rows; i++){
-        for(int j = 0; j < labyrinthe->columns; j++){
+    for(int i = 0; i < labyrinth->rows; i++){
+        for(int j = 0; j < labyrinth->columns; j++){
             if( i % 2 == 1 && j % 2 ==1 ) {
                 mapvalues[i][j] = count++;
             } 
         }
     }
     // This function can be used to create a more complex labyrinth if needed
-    buildLabyrinthBasys(labyrinthe);
+    buildLabyrinthBasys(labyrinth);
     int roomRow, roomCol;
-    while (!isLabyrinthComplete((int **)mapvalues, labyrinthe)){
-        getRandomRoom(&roomRow, &roomCol, labyrinthe);
-        tryToremoveRandomWallAtRoomCoords(roomRow, roomCol, (int **)mapvalues, labyrinthe);
+    while (!isLabyrinthComplete((int **)mapvalues, labyrinth)){
+        getRandomRoom(&roomRow, &roomCol, labyrinth);
+        tryToremoveRandomWallAtRoomCoords(roomRow, roomCol, (int **)mapvalues, labyrinth);
     }
 
-    for(int i = 0; i < labyrinthe->rows; i++){
+    for(int i = 0; i < labyrinth->rows; i++){
         free(mapvalues[i]);
     }
     free(mapvalues);

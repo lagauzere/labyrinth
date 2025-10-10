@@ -8,20 +8,20 @@
 #define PLAYER 'o'
 #define EXIT '-'
 
-typedef struct Labyrinthe {
+typedef struct Labyrinth {
     int rows;
     int columns;
     char **map;
     int playerPosition[2];
-} Labyrinthe;
+} Labyrinth;
 
 
-Labyrinthe initLabyrinthe(int rows, int columns);
+Labyrinth initLabyrinth(int rows, int columns);
 
-void freeLabyrinthe(Labyrinthe* labyrinthe);
+void freeLabyrinth(Labyrinth* labyrinth);
 
-void displayLabyrinthe(const Labyrinthe* labyrinthe);
+void displayLabyrinth(const Labyrinth* labyrinth);
 
-void createLabyrinthe(Labyrinthe* labyrinthe);
+void createLabyrinth(Labyrinth* labyrinth);
 
 #endif
