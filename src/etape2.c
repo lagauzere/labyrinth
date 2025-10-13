@@ -116,7 +116,12 @@ void newLabyrinth(Labyrinth* labyrinth){
     *labyrinth = initLabyrinth(height, width);
     createLabyrinth(labyrinth);
     displayLabyrinth(labyrinth);
-    saveLabyrinthInFile(labyrinth, "save.txt");
+    printf("Merci de donner le nom du fichier de sauvegarde :\n");
+    char *filename = malloc(100 * sizeof(char));
+    scanf("%s", filename);
+    strcat(filename, EXTENSION);
+    saveLabyrinthInFile(labyrinth, filename);
+    free(filename);
     printf("labyrinth libéré\n");
 }
 
@@ -136,7 +141,7 @@ void startGame(Labyrinth* labyrinth ){
 }
 
 void loadGame(Labyrinth* labyrinth){
-    char filename[100] = "save.txt";
+    char filename[100] = "save.config";
     printf("Entrez le nom du fichier de sauvegarde :\n");
     scanf("%s", filename);
 

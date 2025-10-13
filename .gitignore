@@ -1,4 +1,5 @@
 # Ignorer les dossiers de compilation
 obj/
 bin/
-save.txt
+*.txt
+*.config
