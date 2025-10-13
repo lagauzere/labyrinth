@@ -26,4 +26,4 @@ clean:
 	rm -rf obj bin
 
 run: bin/labyrinth
-	LC_ALL=en_US.UTF-8 ./bin/labyrinth
+	./bin/labyrinth
