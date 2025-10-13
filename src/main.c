@@ -8,11 +8,11 @@
 int main() {
     srand(time(NULL));
     // test etape 1
-    printf("--- Etape 1 ---\n");
-    Labyrinth labyrinth = initLabyrinth(11, 25);
-    createLabyrinth(&labyrinth);
-    displayLabyrinth(&labyrinth);
-    freeLabyrinth(&labyrinth);
+    // printf("--- Etape 1 ---\n");
+    // Labyrinth labyrinth = initLabyrinth(11, 25);
+    // createLabyrinth(&labyrinth);
+    // displayLabyrinth(&labyrinth);
+    // freeLabyrinth(&labyrinth);
     
     // test etape 2
     printf("\n--- Etape 2 ---\n");

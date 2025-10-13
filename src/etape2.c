@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include <wchar.h>
 #include <stdio_ext.h>
+#include <string.h>
 
 
 bool isExitReached(Labyrinth* labyrinth){
