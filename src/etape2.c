@@ -4,6 +4,7 @@
 #include "etape1.h"
 #include <stdbool.h>
 #include <wchar.h>
+#include <stdio_ext.h>
 
 
 bool isExitReached(Labyrinth* labyrinth){
@@ -13,6 +14,7 @@ bool isExitReached(Labyrinth* labyrinth){
     }
     return false;
 }
+
 
 void handlePlayerMovement(Labyrinth* labyrinth, char direction){
     int newRow = labyrinth->playerPosition[0];
@@ -126,13 +128,14 @@ void newLabyrinth(Labyrinth* labyrinth){
 }
 
 
-// need to be fixed so that you dont have to press enter to validate the move
+// ncurses can be used to handle key presses more easily
 void startGame(Labyrinth* labyrinth ){
     char move = ' ';
     printf("Entrez votre mouvement (z: haut, s: bas, q: gauche, d: droite):\n");
     displayLabyrinth(labyrinth);
     while (!isExitReached(labyrinth)) {
         // need to find a way to handle single key press without enter
+        __fpurge(stdin);
         move = getchar();
         handlePlayerMovement(labyrinth, move);
         system("clear"); 
