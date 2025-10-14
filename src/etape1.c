@@ -14,6 +14,9 @@ Labyrinth initLabyrinth(int rows, int columns){
     labyrinth.columns = columns;
     labyrinth.playerPosition[0] = 0;
     labyrinth.playerPosition[1] = 1;
+    labyrinth.hasKey = 0;
+    labyrinth.keyPosition[0] = -1; // we dont know dimensions yet
+    labyrinth.keyPosition[1] = -1;
     return labyrinth;
 }
 
@@ -30,9 +33,19 @@ void displayLabyrinth(const Labyrinth* labyrinth){
         for(int j = 0; j < labyrinth->columns; j++){
             if (i == labyrinth->playerPosition[0] && j == labyrinth->playerPosition[1]) {
                 printf("%c", PLAYER); 
-            }else if (labyrinth->map[i][j] == WALL) {
+            } else if (i == labyrinth->keyPosition[0] && j == labyrinth->keyPosition[1] && labyrinth->hasKey == 0) {
+                printf("%c", KEY); 
+            } else if (labyrinth->map[i][j] == WALL) {
                 printf("%s", UTF8_WALL); 
-            }else {
+            } else if (labyrinth->map[i][j] == EXIT) {
+                if(labyrinth->hasKey){
+                    printf("%c", PATH); // open door
+                }
+                else{
+                    printf("%c", DOOR); // closed door
+                }
+            }
+            else {
                 printf("%c", labyrinth->map[i][j]);
             }
         }
@@ -53,6 +66,11 @@ void buildLabyrinthBasys(Labyrinth* labyrinth){
     // Set entrance and exit
     labyrinth->map[0][1] = ENTRANCE; // Entrance
     labyrinth->map[labyrinth->rows - 1][labyrinth->columns - 2] = EXIT; // Exit
+    
+    //set random key position (not on entrance or exit or on player start)
+
+    labyrinth->keyPosition[0] = (rand() % (labyrinth->rows / 2)) * 2 + 1;
+    labyrinth->keyPosition[1] = (rand() % (labyrinth->columns / 2)) * 2 + 1;
 }
 
 void displaymapValues( int **mapvalues, Labyrinth* labyrinth){

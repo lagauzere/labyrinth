@@ -2,4 +2,4 @@
 obj/
 bin/
 *.txt
-*.config
+*.cfg

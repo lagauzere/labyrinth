@@ -2,7 +2,7 @@
 #define ETAPE2_H
 
 #include <wchar.h>
-#define EXTENSION ".config"
+#define EXTENSION ".cfg"
 
 void openMenu();
 

@@ -39,14 +39,20 @@ void handlePlayerMovement(Labyrinth* labyrinth, char direction){
     }
 
     if(newRow >= 0 && newRow < labyrinth->rows && newCol >= 0 && newCol < labyrinth->columns){
-        if(labyrinth->map[newRow][newCol] != WALL){
-            labyrinth->playerPosition[0] = newRow;
-            labyrinth->playerPosition[1] = newCol;
+        if(labyrinth->map[newRow][newCol] == WALL || (labyrinth->map[newRow][newCol] == EXIT && !labyrinth->hasKey)){
+          return; // blocked by wall or closed door
         }
+        if(newRow == labyrinth->keyPosition[0] && newCol == labyrinth->keyPosition[1] && labyrinth->hasKey == 0){
+            labyrinth->hasKey = 1;
+            labyrinth->keyPosition[0] = -1; // remove key from map
+            labyrinth->keyPosition[1] = -1;
+        }
+        labyrinth->playerPosition[0] = newRow;
+        labyrinth->playerPosition[1] = newCol;
     }
 }
 
-// overwrite file if exists, if not create it
+// overwrite file if exists, if not create it ( write and read order matters)
 void saveLabyrinthInFile(Labyrinth* labyrinth, const char* filename) {
     FILE* file = fopen(filename, "w");
     if (file == NULL) {
@@ -59,6 +65,12 @@ void saveLabyrinthInFile(Labyrinth* labyrinth, const char* filename) {
 
       // write player position
     fprintf(file, "%d %d\n", labyrinth->playerPosition[0], labyrinth->playerPosition[1]);
+
+    // write hasKey
+    fprintf(file, "%d\n", labyrinth->hasKey);
+
+    // write key position
+    fprintf(file, "%d %d\n", labyrinth->keyPosition[0], labyrinth->keyPosition[1]);
 
     // Write labyrinth data to file
     for (int i = 0; i < labyrinth->rows; i++) {
@@ -88,6 +100,11 @@ void loadLabyrinthFromFile(Labyrinth* labyrinth, const char* filename) {
     // read player position
     fscanf(file, "%d %d\n", &(*labyrinth).playerPosition[0], &(*labyrinth).playerPosition[1]);
     
+    // read hasKey
+    fscanf(file, "%d\n", &(*labyrinth).hasKey);
+
+    // read key position
+    fscanf(file, "%d %d\n", &(*labyrinth).keyPosition[0], &(*labyrinth).keyPosition[1]);
 
     // Read labyrinth data from file
     for (int i = 0; i < labyrinth->rows; i++) {
@@ -105,8 +122,9 @@ void loadLabyrinthFromFile(Labyrinth* labyrinth, const char* filename) {
 }
 
 void newLabyrinth(Labyrinth* labyrinth){
+    system("clear"); 
     printf("merci de donner les dimensions du labyrinth (largeur hauteur):\n");
-    printf("les doivent être impairs et supérieurs à 5\n");
+    printf("les dimensions doivent être impairs et supérieurs à 5\n");
     int width = 0, height = 0;
     while (width % 2 == 0 || height % 2 == 0 || width < 5 || height < 5)
     {
@@ -118,6 +136,7 @@ void newLabyrinth(Labyrinth* labyrinth){
     }
     *labyrinth = initLabyrinth(height, width);
     createLabyrinth(labyrinth);
+    system("clear"); 
     displayLabyrinth(labyrinth);
     printf("Merci de donner le nom du fichier de sauvegarde :\n");
     char *filename = malloc(100 * sizeof(char));
@@ -125,7 +144,6 @@ void newLabyrinth(Labyrinth* labyrinth){
     strcat(filename, EXTENSION);
     saveLabyrinthInFile(labyrinth, filename);
     free(filename);
-    printf("labyrinth libéré\n");
 }
 
 
@@ -135,7 +153,6 @@ void startGame(Labyrinth* labyrinth ){
     printf("Entrez votre mouvement (z: haut, s: bas, q: gauche, d: droite):\n");
     displayLabyrinth(labyrinth);
     while (!isExitReached(labyrinth)) {
-        // need to find a way to handle single key press without enter
         __fpurge(stdin);
         move = getchar();
         handlePlayerMovement(labyrinth, move);
@@ -145,20 +162,29 @@ void startGame(Labyrinth* labyrinth ){
 }
 
 void loadGame(Labyrinth* labyrinth){
-    char filename[100] = "save.config";
+    char filename[100] = "save.cfg";
     printf("Entrez le nom du fichier de sauvegarde :\n");
     scanf("%s", filename);
-
+    if (strstr(filename, EXTENSION) == NULL) {
+        strcat(filename, EXTENSION);
+    }
     loadLabyrinthFromFile(labyrinth, filename);
-    displayLabyrinth(labyrinth);
-    freeLabyrinth(labyrinth);
-    // Implementation of loadGame function  
 }
 
 void openMenu(){
     Labyrinth labyrinth;
+    labyrinth.map = NULL;
     while (1)
     {
+        __fpurge(stdin);
+        system("clear"); 
+        if(labyrinth.map != NULL){
+            printf("Labyrinth chargé : \n");
+            displayLabyrinth(&labyrinth);
+        }
+        else{
+            printf("Aucun labyrinth chargé.\n");
+        }
         printf("Merci de choisir une option:\n");
         printf("1. Nouveau Labyrinth\n");
         printf("2. Commencer une partie\n");
@@ -178,6 +204,9 @@ void openMenu(){
                 break;
             case 4:
                 printf("Au revoir!\n");
+                if(labyrinth.map != NULL){
+                    freeLabyrinth(&labyrinth);
+                }
                 return;
             break;
         }
