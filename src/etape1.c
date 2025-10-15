@@ -4,6 +4,19 @@
 #include <stdbool.h>
 #include <locale.h>
 
+bool isSameCoords(int* pos1, int* pos2){
+    return pos1[0] == pos2[0] && pos1[1] == pos2[1];
+}
+
+bool isCoordinateInCoordinatesArray(int* coords, int **coordinatesArray, int size){
+    for(int i = 0; i < size; i++){
+        if(isSameCoords(coords, coordinatesArray[i])){
+            return true;
+        }
+    }
+    return false;
+}
+
 Labyrinth initLabyrinth(int rows, int columns){
     Labyrinth labyrinth;
     labyrinth.map = malloc(rows * sizeof(wchar_t*));
@@ -17,9 +30,18 @@ Labyrinth initLabyrinth(int rows, int columns){
     labyrinth.hasKey = 0;
     labyrinth.keyPosition[0] = -1; // we dont know dimensions yet
     labyrinth.keyPosition[1] = -1;
-    for(int i = 0; i < nbTreasures; i++){
+    labyrinth.treasuresPositions = malloc(TREASURES * sizeof(int*));
+    for(int i = 0; i < TREASURES; i++){
+        labyrinth.treasuresPositions[i] = malloc(2 * sizeof(int));
         labyrinth.treasuresPositions[i][0] = -1;
         labyrinth.treasuresPositions[i][1] = -1;
+    }
+
+    labyrinth.trapPositions = malloc(TRAPS * sizeof(int*));
+    for(int i = 0; i < TRAPS; i++){
+        labyrinth.trapPositions[i] = malloc(2 * sizeof(int));
+        labyrinth.trapPositions[i][0] = -1;
+        labyrinth.trapPositions[i][1] = -1;
     }
     labyrinth.score = 0;
     return labyrinth;
@@ -30,6 +52,11 @@ void freeLabyrinth(Labyrinth* labyrinth){
         free(labyrinth->map[i]);
     }
     free(labyrinth->map);
+
+    for(int i = 0; i < TREASURES; i++){
+        free(labyrinth->treasuresPositions[i]);
+    }
+    free(labyrinth->treasuresPositions);
 }
 
 
@@ -51,38 +78,45 @@ void displayLabyrinth(const Labyrinth* labyrinth){
                 else{
                     printf("%s", UTF8_DOOR);
                 }
+            } else if (isCoordinateInCoordinatesArray((int[]){i, j}, labyrinth->treasuresPositions, (int)TREASURES)) {
+                printf("%c", TREASURE);
+
+            } else if (isCoordinateInCoordinatesArray((int[]){i, j}, labyrinth->trapPositions, (int)TRAPS)) {
+                printf("X");
             }
             else {
                 printf("%c", labyrinth->map[i][j]);
-            }
+            } 
         }
         printf("\n");
     }
 }
 
-
-bool isSameCoords(int* pos1, int* pos2){
-    return pos1[0] == pos2[0] && pos1[1] == pos2[1];
-}
-
-bool isCoordinateDuplicatedInCoordinatesArray(int* coords, int coordinatesArray[][2], int size){
-    for(int i = 0; i < size; i++){
-        if(isSameCoords(coords, coordinatesArray[i])){
-            return true;
-        }
-    }
-    return false;
-}
-
 void setRandomTreasuresInLabyrinth(Labyrinth* labyrinth){
-    for(int i = 0; i < nbTreasures; i++){
+    for(int i = 0; i < TREASURES; i++){
         int coords[2];
         do{
             coords[0] = (rand() % (labyrinth->rows / 2)) * 2 + 1;
             coords[1] = (rand() % (labyrinth->columns / 2)) * 2 + 1;
-            labyrinth->treasuresPositions[i][0] = coords[0];
-            labyrinth->treasuresPositions[i][1] = coords[1];
-        }while( (isSameCoords(coords, labyrinth->keyPosition) || isCoordinateDuplicatedInCoordinatesArray(coords, labyrinth->treasuresPositions, i)));
+        }while( isSameCoords(coords, labyrinth->keyPosition) 
+        || isCoordinateInCoordinatesArray(coords, labyrinth->treasuresPositions, i) 
+    || isCoordinateInCoordinatesArray(coords, (int**)labyrinth->trapPositions, TRAPS) );
+        labyrinth->treasuresPositions[i][0] = coords[0];
+        labyrinth->treasuresPositions[i][1] = coords[1];
+    }
+}
+
+void setRandomTrapsInLabyrinth(Labyrinth* labyrinth){
+    for(int i = 0; i < TRAPS; i++){
+        int coords[2];
+        do{
+            coords[0] = (rand() % (labyrinth->rows / 2)) * 2 + 1;
+            coords[1] = (rand() % (labyrinth->columns / 2)) * 2 + 1;
+        }while( isSameCoords(coords, labyrinth->keyPosition) 
+        || isCoordinateInCoordinatesArray(coords, labyrinth->treasuresPositions, TREASURES) 
+    || isCoordinateInCoordinatesArray(coords, (int**)labyrinth->trapPositions, i) );
+        labyrinth->trapPositions[i][0] = coords[0];
+        labyrinth->trapPositions[i][1] = coords[1];
     }
 }
 
@@ -104,8 +138,11 @@ void buildLabyrinthBasys(Labyrinth* labyrinth){
     labyrinth->keyPosition[0] = (rand() % (labyrinth->rows / 2)) * 2 + 1;
     labyrinth->keyPosition[1] = (rand() % (labyrinth->columns / 2)) * 2 + 1;
 
-    // set random treasures positions ( cant have two treasures at the same place or on the key position)
+    // set random treasures positions
     setRandomTreasuresInLabyrinth(labyrinth);
+
+    // set random traps positions
+    setRandomTrapsInLabyrinth(labyrinth);
 }
 
 void displaymapValues( int **mapvalues, Labyrinth* labyrinth){
@@ -188,8 +225,6 @@ void tryToremoveRandomWallAtRoomCoords(int roomRow, int roomCol, int **mapvalues
             replaceAllInMapValues(oldValue, newValue, mapvalues, labyrinth);
         }
     }
-
-    
 }
 
 void createLabyrinth(Labyrinth* labyrinth){

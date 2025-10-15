@@ -1,6 +1,6 @@
 #ifndef ETAPE1_H
 #define ETAPE1_H
-#include <wchar.h>
+#include <stdbool.h>
 
 #define UTF8_WALL "█"
 #define WALL '#'
@@ -10,9 +10,13 @@
 #define ENTRANCE '~'
 #define KEY '*'
 #define UTF8_DOOR "▀"
+#define TREASURE '$'
 
-#define treasureScore 10
-#define nbTreasures 5 
+#define TREASURE_VALUE 10
+#define TREASURES 5 
+
+#define TRAP_VALUE -5
+#define TRAPS 3
 
 typedef struct Labyrinth {
     int score;
@@ -22,7 +26,8 @@ typedef struct Labyrinth {
     char **map;
     int playerPosition[2];
     int keyPosition[2];
-    int treasuresPositions[nbTreasures][2];
+    int **treasuresPositions;
+    int **trapPositions;
 } Labyrinth;
 
 
@@ -33,5 +38,5 @@ void freeLabyrinth(Labyrinth* labyrinth);
 void displayLabyrinth(const Labyrinth* labyrinth);
 
 void createLabyrinth(Labyrinth* labyrinth);
-
+bool isCoordinateInCoordinatesArray(int* coords, int **coordinatesArray, int size);
 #endif
