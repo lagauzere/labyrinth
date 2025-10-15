@@ -9,7 +9,7 @@
 #define EXIT '-'
 #define ENTRANCE '~'
 #define KEY '*'
-#define DOOR '+'
+#define UTF8_DOOR "▀"
 
 typedef struct Labyrinth {
     int hasKey; // 1 if player has the key, 0 otherwise

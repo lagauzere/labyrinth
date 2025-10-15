@@ -149,6 +149,7 @@ void newLabyrinth(Labyrinth* labyrinth){
 
 // ncurses can be used to handle key presses more easily
 void startGame(Labyrinth* labyrinth ){
+    system("clear"); 
     char move = ' ';
     printf("Entrez votre mouvement (z: haut, s: bas, q: gauche, d: droite):\n");
     displayLabyrinth(labyrinth);
@@ -157,18 +158,57 @@ void startGame(Labyrinth* labyrinth ){
         move = getchar();
         handlePlayerMovement(labyrinth, move);
         system("clear"); 
+        printf("Entrez votre mouvement (z: haut, s: bas, q: gauche, d: droite):\n");
         displayLabyrinth(labyrinth);
     }
 }
 
-void loadGame(Labyrinth* labyrinth){
-    char filename[100] = "save.cfg";
-    printf("Entrez le nom du fichier de sauvegarde :\n");
-    scanf("%s", filename);
-    if (strstr(filename, EXTENSION) == NULL) {
-        strcat(filename, EXTENSION);
+
+void listSaveFiles(char*** files, int* fileCount) {
+    FILE* pipe = popen("ls *.cfg 2>/dev/null", "r"); // la redirection évite l'affichage des erreurs si il n'y a pas de fichiers
+    if (pipe == NULL) {
+        perror("Erreur lors de l'ouverture du pipe");
+        return;
     }
-    loadLabyrinthFromFile(labyrinth, filename);
+
+    char buffer[256];
+    *fileCount = 0;
+    *files = NULL;
+
+    while (fgets(buffer, sizeof(buffer), pipe) != NULL) {
+        buffer[strcspn(buffer, "\n")] = 0; 
+        *files = realloc(*files, (*fileCount + 1) * sizeof(char*));
+        (*files)[*fileCount] = strdup(buffer);
+        (*fileCount)++;
+    }
+    pclose(pipe);
+    
+}
+
+void loadGame(Labyrinth* labyrinth){
+    __fpurge(stdin);
+    system("clear"); 
+    char **files = NULL;
+    int fileCount = 0;
+    listSaveFiles(&files, &fileCount);
+    if (fileCount == 0) {
+        printf("Aucun fichier de sauvegarde trouvé. Appuyez sur Entrée pour continuer...");
+        getchar();
+    }else{
+        for (int i = 0; i < fileCount; i++) {
+            printf("%d. %s\n", i + 1, files[i]);
+        }
+        printf("Entrez le numéro du fichier à charger:\n");
+        int choice = 0;
+        while (choice < 1 || choice > fileCount) {
+            scanf("%d", &choice);
+            if (choice < 1 || choice > fileCount) {
+                printf("Choix invalide, merci de réessayer:\n");
+            }
+        }
+        char* filename = files[choice - 1];
+        loadLabyrinthFromFile(labyrinth, filename);
+    }
 }
 
 void openMenu(){
@@ -179,13 +219,13 @@ void openMenu(){
         __fpurge(stdin);
         system("clear"); 
         if(labyrinth.map != NULL){
-            printf("Labyrinth chargé : \n");
+            printf("Labyrinth chargé : \n\n");
             displayLabyrinth(&labyrinth);
         }
         else{
             printf("Aucun labyrinth chargé.\n");
         }
-        printf("Merci de choisir une option:\n");
+        printf("\nMerci de choisir une option:\n");
         printf("1. Nouveau Labyrinth\n");
         printf("2. Commencer une partie\n");
         printf("3. Charger une partie\n");
@@ -200,7 +240,7 @@ void openMenu(){
                 startGame(&labyrinth);
                 break;
             case 3:
-                loadGame(&labyrinth);
+            loadGame(&labyrinth);
                 break;
             case 4:
                 printf("Au revoir!\n");

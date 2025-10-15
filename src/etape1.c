@@ -39,10 +39,10 @@ void displayLabyrinth(const Labyrinth* labyrinth){
                 printf("%s", UTF8_WALL); 
             } else if (labyrinth->map[i][j] == EXIT) {
                 if(labyrinth->hasKey){
-                    printf("%c", PATH); // open door
+                    printf("%c", EXIT); // open door
                 }
                 else{
-                    printf("%c", DOOR); // closed door
+                    printf("%s", UTF8_DOOR); // closed door
                 }
             }
             else {
