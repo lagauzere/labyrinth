@@ -11,13 +11,18 @@
 #define KEY '*'
 #define UTF8_DOOR "▀"
 
+#define treasureScore 10
+#define nbTreasures 5 
+
 typedef struct Labyrinth {
+    int score;
     int hasKey; // 1 if player has the key, 0 otherwise
     int rows;
     int columns;
     char **map;
     int playerPosition[2];
     int keyPosition[2];
+    int treasuresPositions[nbTreasures][2];
 } Labyrinth;
 
 

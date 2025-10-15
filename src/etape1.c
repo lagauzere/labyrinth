@@ -17,6 +17,11 @@ Labyrinth initLabyrinth(int rows, int columns){
     labyrinth.hasKey = 0;
     labyrinth.keyPosition[0] = -1; // we dont know dimensions yet
     labyrinth.keyPosition[1] = -1;
+    for(int i = 0; i < nbTreasures; i++){
+        labyrinth.treasuresPositions[i][0] = -1;
+        labyrinth.treasuresPositions[i][1] = -1;
+    }
+    labyrinth.score = 0;
     return labyrinth;
 }
 
@@ -28,6 +33,8 @@ void freeLabyrinth(Labyrinth* labyrinth){
 }
 
 
+
+// god it's messy
 void displayLabyrinth(const Labyrinth* labyrinth){
     for(int i = 0; i < labyrinth->rows; i++){
         for(int j = 0; j < labyrinth->columns; j++){
@@ -39,10 +46,10 @@ void displayLabyrinth(const Labyrinth* labyrinth){
                 printf("%s", UTF8_WALL); 
             } else if (labyrinth->map[i][j] == EXIT) {
                 if(labyrinth->hasKey){
-                    printf("%c", EXIT); // open door
+                    printf("%c", EXIT);
                 }
                 else{
-                    printf("%s", UTF8_DOOR); // closed door
+                    printf("%s", UTF8_DOOR);
                 }
             }
             else {
@@ -50,6 +57,32 @@ void displayLabyrinth(const Labyrinth* labyrinth){
             }
         }
         printf("\n");
+    }
+}
+
+
+bool isSameCoords(int* pos1, int* pos2){
+    return pos1[0] == pos2[0] && pos1[1] == pos2[1];
+}
+
+bool isCoordinateDuplicatedInCoordinatesArray(int* coords, int coordinatesArray[][2], int size){
+    for(int i = 0; i < size; i++){
+        if(isSameCoords(coords, coordinatesArray[i])){
+            return true;
+        }
+    }
+    return false;
+}
+
+void setRandomTreasuresInLabyrinth(Labyrinth* labyrinth){
+    for(int i = 0; i < nbTreasures; i++){
+        int coords[2];
+        do{
+            coords[0] = (rand() % (labyrinth->rows / 2)) * 2 + 1;
+            coords[1] = (rand() % (labyrinth->columns / 2)) * 2 + 1;
+            labyrinth->treasuresPositions[i][0] = coords[0];
+            labyrinth->treasuresPositions[i][1] = coords[1];
+        }while( (isSameCoords(coords, labyrinth->keyPosition) || isCoordinateDuplicatedInCoordinatesArray(coords, labyrinth->treasuresPositions, i)));
     }
 }
 
@@ -68,9 +101,11 @@ void buildLabyrinthBasys(Labyrinth* labyrinth){
     labyrinth->map[labyrinth->rows - 1][labyrinth->columns - 2] = EXIT; // Exit
     
     //set random key position (not on entrance or exit or on player start)
-
     labyrinth->keyPosition[0] = (rand() % (labyrinth->rows / 2)) * 2 + 1;
     labyrinth->keyPosition[1] = (rand() % (labyrinth->columns / 2)) * 2 + 1;
+
+    // set random treasures positions ( cant have two treasures at the same place or on the key position)
+    setRandomTreasuresInLabyrinth(labyrinth);
 }
 
 void displaymapValues( int **mapvalues, Labyrinth* labyrinth){
