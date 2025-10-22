@@ -9,13 +9,16 @@ bin/labyrinth: obj/main.o obj/etape1.o obj/etape2.o | bin
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) $^ -o $@
 
 obj/main.o: src/main.c include/etape1.h include/etape2.h  | obj
-	$(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) -c src/main.c -o obj/main.o
+	$(CC) $(CFLAGS) $(CPPFLAGS)  -c src/main.c -o obj/main.o
 
 obj/etape1.o: src/etape1.c include/etape1.h  | obj
-	$(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) -c src/etape1.c -o obj/etape1.o
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c src/etape1.c -o obj/etape1.o
 
 obj/etape2.o: src/etape2.c include/etape2.h  | obj
-	$(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) -c src/etape2.c -o obj/etape2.o
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c src/etape2.c -o obj/etape2.o
+
+bin/exemple: src/ncurses.c | bin
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) $^ -o $@
 
 obj:	
 	mkdir -p obj
@@ -28,3 +31,6 @@ clean:
 
 run: bin/labyrinth
 	./bin/labyrinth
+
+exemple: bin/exemple
+	./bin/exemple
