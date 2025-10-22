@@ -1,20 +1,21 @@
 CC = gcc
 CFLAGS = -Wall -Wextra 
 CPPFLAGS = -I./include
+LDFLAGS = -lncurses
 
 all: bin/labyrinth
 
 bin/labyrinth: obj/main.o obj/etape1.o obj/etape2.o | bin
-	$(CC) $(CFLAGS) $(CPPFLAGS) $^ -o $@
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) $^ -o $@
 
 obj/main.o: src/main.c include/etape1.h include/etape2.h  | obj
-	$(CC) $(CFLAGS) $(CPPFLAGS) -c src/main.c -o obj/main.o
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) -c src/main.c -o obj/main.o
 
 obj/etape1.o: src/etape1.c include/etape1.h  | obj
-	$(CC) $(CFLAGS) $(CPPFLAGS) -c src/etape1.c -o obj/etape1.o
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) -c src/etape1.c -o obj/etape1.o
 
 obj/etape2.o: src/etape2.c include/etape2.h  | obj
-	$(CC) $(CFLAGS) $(CPPFLAGS) -c src/etape2.c -o obj/etape2.o
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) -c src/etape2.c -o obj/etape2.o
 
 obj:	
 	mkdir -p obj

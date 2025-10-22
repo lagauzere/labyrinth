@@ -7,6 +7,16 @@
 #include <stdio_ext.h>
 #include <string.h>
 
+int removeCoordinateInCoordinatesArray(int * coords, int ** coordinatesArray, int size){
+    for(int i = 0; i< size; i++){
+        if(coords[0] == coordinatesArray[i][0] && coords[1] == coordinatesArray[i][1]){
+            coordinatesArray[i][0] = -1;
+            coordinatesArray[i][1] = -1;
+            return 0;
+        }
+    }
+    return -1;
+}
 
 bool isExitReached(Labyrinth* labyrinth){
     if(labyrinth->map[labyrinth->playerPosition[0]][labyrinth->playerPosition[1]] == EXIT){
@@ -51,14 +61,13 @@ void handlePlayerMovement(Labyrinth* labyrinth, char direction){
         }
         if(isCoordinateInCoordinatesArray((int[]){newRow, newCol}, labyrinth->treasuresPositions, TREASURES)){
             labyrinth->score += TREASURE_VALUE;
-            // remove treasure from map
-            for(int i = 0; i < TREASURES; i++){
-                if(labyrinth->treasuresPositions[i][0] == newRow && labyrinth->treasuresPositions[i][1] == newCol){
-                    labyrinth->treasuresPositions[i][0] = -1;
-                    labyrinth->treasuresPositions[i][1] = -1;
-                }
-            }
+            removeCoordinateInCoordinatesArray((int[]){newRow, newCol}, labyrinth->treasuresPositions, TREASURES);
         }
+        if(isCoordinateInCoordinatesArray((int[]){newRow, newCol}, labyrinth->trapPositions, TRAPS)){
+            labyrinth->score += TRAP_VALUE;
+            removeCoordinateInCoordinatesArray((int[]){newRow, newCol}, labyrinth->trapPositions, TREASURES);
+        }
+    
         labyrinth->playerPosition[0] = newRow;
         labyrinth->playerPosition[1] = newCol;
     }
@@ -99,7 +108,6 @@ void saveLabyrinthInFile(Labyrinth* labyrinth, const char* filename) {
     fclose(file);
 }
 
-
 void loadLabyrinthFromFile(Labyrinth* labyrinth, const char* filename) {
     FILE* file = fopen(filename, "r");
     if (file == NULL) {
@@ -111,8 +119,6 @@ void loadLabyrinthFromFile(Labyrinth* labyrinth, const char* filename) {
     int rows, columns;
     fscanf(file, "%d %d\n", &rows, &columns);
     *labyrinth = initLabyrinth(rows, columns);
-
-    printf("rows: %d, columns: %d\n", rows, columns);
 
     // read player position
     fscanf(file, "%d %d\n", &(*labyrinth).playerPosition[0], &(*labyrinth).playerPosition[1]);
@@ -189,7 +195,7 @@ void startGame(Labyrinth* labyrinth ){
 
 
 void listSaveFiles(char*** files, int* fileCount) {
-    FILE* pipe = popen("ls *.cfg 2>/dev/null", "r"); // redirection is to not display error if no file
+    FILE* pipe = popen("ls *.cfg 2>/dev/null", "r");
     if (pipe == NULL) {
         perror("Erreur lors de l'ouverture du pipe");
         return;
