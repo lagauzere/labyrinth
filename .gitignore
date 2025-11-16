@@ -1,5 +1,6 @@
 # Ignorer les dossiers de compilation
 obj/
 bin/
-*.txt
+# Ignorer les fichiers de sauvegarde
 *.cfg
+*.score

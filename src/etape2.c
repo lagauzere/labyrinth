@@ -7,6 +7,95 @@
 #include <stdio_ext.h>
 #include <string.h>
 
+// top 10 leaderboard management
+
+bool isScoreInTop10(int score){
+    FILE* file = fopen("leaderboard.score", "r");
+    if (file == NULL) {
+        return true; // file doesn't exist yet, so any score is in top 10
+    }
+    int scores[10];
+    int count = 0;
+    while (fscanf(file, "%d", &scores[count]) != EOF && count < 10) {
+        count++;
+    }
+    fclose(file);
+    if (count < 10) {
+        return true; // less than 10 scores, so any score is in top 10
+    }
+    for (int i = 0; i < 10; i++) {
+        if (score > scores[i]) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void addOrReplaceScoreAndPlayerNameInTop10(int score, const char* playerName){
+    FILE* file = fopen("leaderboard.score", "r");
+    int scores[10];
+    char names[10][50];
+    int count = 0;
+    if (file != NULL) {
+        while (fscanf(file, "%49s %d", names[count], &scores[count]) != EOF && count < 10) {
+            count++;
+        }
+        fclose(file);
+    }
+    // add new score
+    scores[count] = score;
+    strcpy(names[count], playerName);
+    count++;
+
+    // sort scores
+    for (int i = 0; i < count - 1; i++) {
+        for (int j = i + 1; j < count; j++) {
+            if (scores[j] > scores[i]) {
+                int tempScore = scores[i];
+                scores[i] = scores[j];
+                scores[j] = tempScore;
+                char tempName[50];
+                strcpy(tempName, names[i]);
+                strcpy(names[i], names[j]);
+                strcpy(names[j], tempName);
+            }
+        }
+    }
+
+    // write back top 10
+    file = fopen("leaderboard.score", "w");
+    for (int i = 0; i < count && i < 10; i++) {
+        fprintf(file, "%s %d\n", names[i], scores[i]);
+    }
+    fclose(file);
+}
+   
+
+void displayTop10(){
+     __fpurge(stdin);
+    system("clear"); 
+    FILE* file = fopen("leaderboard.score", "r");
+    if (file == NULL) {
+        printf("Aucun fichier de score trouvé.\n");
+        printf("Appuyez sur Entrée pour continuer...");
+        getchar();
+        return;
+    }
+    printf("----- Top 10 Scores -----\n");
+    char name[50];
+    int score;
+    int rank = 1;
+    while (fscanf(file, "%49s %d", name, &score) != EOF) {
+        printf("%d. %s - %d\n", rank, name, score);
+        rank++;
+    }
+    fclose(file);
+    printf("-------------------------\n");
+    printf("Appuyez sur Entrée pour continuer...");
+    getchar();
+   
+}
+
 int removeCoordinateInCoordinatesArray(int * coords, int ** coordinatesArray, int size){
     for(int i = 0; i< size; i++){
         if(coords[0] == coordinatesArray[i][0] && coords[1] == coordinatesArray[i][1]){
@@ -20,7 +109,6 @@ int removeCoordinateInCoordinatesArray(int * coords, int ** coordinatesArray, in
 
 bool isExitReached(Labyrinth* labyrinth){
     if(labyrinth->map[labyrinth->playerPosition[0]][labyrinth->playerPosition[1]] == EXIT){
-        printf("Félicitations! Vous avez atteint la sortie!\n");
         return true;
     }
     return false;
@@ -70,6 +158,7 @@ void handlePlayerMovement(Labyrinth* labyrinth, char direction){
     
         labyrinth->playerPosition[0] = newRow;
         labyrinth->playerPosition[1] = newCol;
+        labyrinth->score += MOVE_PENALTY;
     }
 }
 
@@ -175,8 +264,17 @@ void newLabyrinth(Labyrinth* labyrinth){
 }
 
 
-// ncurses can be used to handle key presses more easily
 void startGame(Labyrinth* labyrinth ){
+    // check if labyrinth is loaded
+    if(labyrinth->map == NULL){
+        __fpurge(stdin);
+        system("clear");
+        printf("Aucun labyrinth chargé. Merci de créer ou charger un labyrinth avant de commencer une partie.\n");
+        printf("Appuyez sur Entrée pour continuer...");
+        getchar();
+        return;
+    }
+    __fpurge(stdin);
     system("clear"); 
     char move = ' ';
     printf("Entrez votre mouvement (z: haut, s: bas, q: gauche, d: droite):\n");
@@ -193,6 +291,16 @@ void startGame(Labyrinth* labyrinth ){
     }
     printf("\nFélicitations! Vous avez terminé le labyrinth!\n");
     printf("Votre score final est de %d points!\n", labyrinth->score);
+    if (isScoreInTop10(labyrinth->score)) {
+        printf("Vous êtes dans le top 10! Entrez votre nom:\n");
+        char playerName[50];
+        __fpurge(stdin);
+        fgets(playerName, sizeof(playerName), stdin);
+        playerName[strcspn(playerName, "\n")] = 0; 
+        addOrReplaceScoreAndPlayerNameInTop10(labyrinth->score, playerName);
+    } 
+    // free loaded labyrinth
+    freeLabyrinth(labyrinth);
 }
 
 
@@ -216,6 +324,7 @@ void listSaveFiles(char*** files, int* fileCount) {
     pclose(pipe);
     
 }
+
 
 void loadGame(Labyrinth* labyrinth){
     __fpurge(stdin);
@@ -261,7 +370,8 @@ void openMenu(){
         printf("1. Nouveau Labyrinth\n");
         printf("2. Commencer une partie\n");
         printf("3. Charger une partie\n");
-        printf("4. Quitter\n");
+        printf("4. Afficher le top 10\n");
+        printf("5. Quitter\n");
         int choice;
         scanf("%d", &choice);
         switch(choice){
@@ -275,6 +385,9 @@ void openMenu(){
             loadGame(&labyrinth);
                 break;
             case 4:
+                displayTop10();
+                break;
+            case 5:
                 printf("Au revoir!\n");
                 if(labyrinth.map != NULL){
                     freeLabyrinth(&labyrinth);

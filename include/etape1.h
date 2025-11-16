@@ -18,6 +18,8 @@
 #define TRAP_VALUE -5
 #define TRAPS 3
 
+#define MOVE_PENALTY -1
+
 typedef struct Labyrinth {
     int score;
     int hasKey; // 1 if player has the key, 0 otherwise
