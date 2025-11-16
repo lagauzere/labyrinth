@@ -1,5 +1,7 @@
 #  Projet Labyrinthe en C
 
+https://github.com/lagauzere/labyrinth
+
 ##  Description
 
 Ce projet est un petit jeu de **labyrinthe en terminal**, entièrement écrit en **C**.  
@@ -23,23 +25,9 @@ Le projet est divisé en deux étapes principales :
 
 ---
 
-##  Compilation
+##  Compilation et exécution
 
-Pour compiler le projet, utilisez `gcc` :
-
-```bash
-gcc main.c etape1.c etape2.c -o labyrinthe
-```
-
----
-
-## ▶ Exécution
-
-Lancez simplement le programme compilé :
-
-```bash
-./labyrinthe
-```
+Il suffit simplement de lancer la commande "make run"
 
 Vous verrez apparaître un menu interactif :
 

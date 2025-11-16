@@ -191,6 +191,8 @@ void startGame(Labyrinth* labyrinth ){
         printf("Score: %d\n\n", labyrinth->score);
         displayLabyrinth(labyrinth);
     }
+    printf("\nFélicitations! Vous avez terminé le labyrinth!\n");
+    printf("Votre score final est de %d points!\n", labyrinth->score);
 }
 
 
