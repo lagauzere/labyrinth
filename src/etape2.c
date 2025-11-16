@@ -16,7 +16,7 @@ bool isScoreInTop10(int score){
     }
     int scores[10];
     int count = 0;
-    while (fscanf(file, "%d", &scores[count]) != EOF && count < 10) {
+    while (fscanf(file, "%*s %d", &scores[count]) != EOF && count < 10) {
         count++;
     }
     fclose(file);
@@ -31,7 +31,7 @@ bool isScoreInTop10(int score){
     return false;
 }
 
-void addOrReplaceScoreAndPlayerNameInTop10(int score, const char* playerName){
+void updateTop10(int score, const char* playerName){
     FILE* file = fopen("leaderboard.score", "r");
     int scores[10];
     char names[10][50];
@@ -289,18 +289,21 @@ void startGame(Labyrinth* labyrinth ){
         printf("Score: %d\n\n", labyrinth->score);
         displayLabyrinth(labyrinth);
     }
+    __fpurge(stdin);
+    system("clear"); 
     printf("\nFélicitations! Vous avez terminé le labyrinth!\n");
     printf("Votre score final est de %d points!\n", labyrinth->score);
+    printf("Appuyez sur Entrée pour continuer...");
+    getchar();
     if (isScoreInTop10(labyrinth->score)) {
         printf("Vous êtes dans le top 10! Entrez votre nom:\n");
         char playerName[50];
         __fpurge(stdin);
         fgets(playerName, sizeof(playerName), stdin);
         playerName[strcspn(playerName, "\n")] = 0; 
-        addOrReplaceScoreAndPlayerNameInTop10(labyrinth->score, playerName);
+        updateTop10(labyrinth->score, playerName);
+        displayTop10();
     } 
-    // free loaded labyrinth
-    freeLabyrinth(labyrinth);
 }
 
 
@@ -380,6 +383,9 @@ void openMenu(){
                 break;
             case 2:
                 startGame(&labyrinth);
+                // free labyrinth after game
+                freeLabyrinth(&labyrinth);
+                labyrinth.map = NULL;
                 break;
             case 3:
             loadGame(&labyrinth);
